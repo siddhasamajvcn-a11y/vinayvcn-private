@@ -3,303 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Financial Tracker Pro</title>
+    <title>Vessel Volume Calculator</title>
     <style>
-        :root {
-            --primary: #007bff;
-            --success: #28a745;
-            --danger: #dc3545;
-            --bg: #f4f7f9;
-        }
-
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 20px auto;
             padding: 20px;
-            background-color: var(--bg);
-            color: #333;
         }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border: 1px solid #e0e0e0;
+        .calculator {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
         }
-
-        /* Tabs */
-        .tabs { display: flex; background: #f8f9fa; border-bottom: 2px solid #eee; }
-        .tab-button {
-            flex: 1; padding: 18px; cursor: pointer; border: none; background: none;
-            font-size: 16px; font-weight: 600; color: #666; transition: 0.3s;
+        .input-group {
+            margin-bottom: 15px;
         }
-        .tab-button.active { color: var(--primary); background: #fff; border-bottom: 3px solid var(--primary); }
-
-        .tab-content { display: none; padding: 25px; }
-        .tab-content.active { display: block; }
-
-        /* Summary Boxes */
-        .summary-card {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px; margin-bottom: 20px;
+        label {
+            display: block;
+            margin-bottom: 5px;
         }
-        .stat-box {
-            padding: 20px; border-radius: 12px; background: #f8fbff;
-            border: 1px solid #e3f2fd; position: relative;
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
-        .stat-label { font-size: 0.9em; color: #666; margin-bottom: 5px; }
-        .stat-value { font-size: 1.5em; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-
-        /* Animations */
-        @keyframes pulse-red { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes bounce-green { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        .trend-down { color: var(--danger); animation: pulse-red 1.5s infinite; font-size: 1.2em; }
-        .trend-up { color: var(--success); animation: bounce-green 1.5s infinite; font-size: 1.2em; }
-
-        /* Inputs */
-        .input-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; flex: 1; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
-        
-        button { 
-            padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer; 
-            font-weight: 600; transition: 0.2s; 
+        .result {
+            font-weight: bold;
+            margin-top: 15px;
+            color: #2c3e50;
         }
-        .btn-add { background: var(--primary); color: #fff; }
-        .btn-list { background: #6c757d; color: #fff; }
-        .btn-export { background: #28a745; color: #fff; margin-top: 10px; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        /* List Styling */
-        .list-container { border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
-        .list-header, .list-item { 
-            display: grid; padding: 12px 15px; align-items: center; border-bottom: 1px solid #eee; 
-        }
-        .list-header { background: #f8f9fa; font-weight: bold; font-size: 0.9em; }
-        .doctor-grid { grid-template-columns: 50px 100px 1fr 120px 50px; }
-        .bank-grid { grid-template-columns: 1fr 1fr 120px 50px; }
-
-        .delete-btn { color: var(--danger); cursor: pointer; border: none; background: none; font-size: 1.1em; }
-        .delete-btn:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="tabs">
-        <button class="tab-button active" onclick="openTab('doctor-fees')">👨‍⚕️ Doctor Fees</button>
-        <button class="tab-button" onclick="openTab('bank-tracker')">🏦 Bank Entry Tracker</button>
+    <div class="calculator">
+        <h2>Vessel Volume Calculator</h2>
+        <div class="input-group">
+            <label>Total Height of Vessel (cm):</label>
+            <input type="number" id="totalHeight" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>Balance Height (cm):</label>
+            <input type="number" id="balanceHeight" step="0.1">
+        </div>
+        <div class="input-group">
+            <label>Diameter (cm):</label>
+            <input type="number" id="diameter" step="0.1">
+        </div>
+        <div class="result" id="result"></div>
     </div>
 
-    <div id="doctor-fees" class="tab-content active">
-        <div class="summary-card">
-            <div class="stat-box" style="border-left: 5px solid var(--danger);">
-                <div class="stat-label">Total Payable (Unchecked)</div>
-                <div class="stat-value" id="doc-payable">0.00</div>
-            </div>
-            <button class="btn-export" onclick="exportData('doctor')">📥 Export Doctor List</button>
-        </div>
+    <script>
+        function calculateVolume() {
+            // Get input values
+            const totalHeight = parseFloat(document.getElementById('totalHeight').value);
+            const balanceHeight = parseFloat(document.getElementById('balanceHeight').value);
+            const diameter = parseFloat(document.getElementById('diameter').value);
 
-        <div class="input-row">
-            <button class="btn-add" style="border-radius: 50%; width: 50px; height: 50px;" onclick="quickAdd(150)">150</button>
-            <input type="number" id="doc-amount" placeholder="Amount (Negative allowed)" step="0.01">
-            <input type="text" id="doc-name" placeholder="Patient Name" onkeydown="handleDocKey(event)">
-            <button class="btn-add" onclick="addDoctorEntry()">Add Entry</button>
-        </div>
+            // Validate inputs
+            if (isNaN(totalHeight) || isNaN(balanceHeight) || isNaN(diameter)) {
+                document.getElementById('result').textContent = 'Please fill all fields';
+                return;
+            }
 
-        <div class="list-container">
-            <div class="list-header doctor-grid">
-                <div>Paid</div><div>Amount</div><div>Patient</div><div>Time</div><div></div>
-            </div>
-            <div id="doctor-list"></div>
-        </div>
-    </div>
+            if (totalHeight <= 0 || diameter <= 0) {
+                document.getElementById('result').textContent = 'Total height and diameter must be positive';
+                return;
+            }
 
-    <div id="bank-tracker" class="tab-content">
-        <div class="summary-card">
-            <div class="stat-box">
-                <div class="stat-label">Computer Total</div>
-                <div class="stat-value">
-                    <span id="comp-total">0.00</span>
-                    <span id="comp-arrow"></span>
-                </div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Bank Total</div>
-                <div class="stat-value">
-                    <span id="bank-total">0.00</span>
-                    <span id="bank-arrow"></span>
-                </div>
-            </div>
-            <div class="stat-box" id="diff-box">
-                <div class="stat-label">Difference</div>
-                <div class="stat-value" id="bank-diff">0.00</div>
-            </div>
-        </div>
+            if (balanceHeight < 0) {
+                document.getElementById('result').textContent = 'Balance height cannot be negative';
+                return;
+            }
 
-        <div class="input-row">
-            <input type="number" id="input-comp" placeholder="Computer Amount" step="0.01" onkeydown="handleBankKey(event, 'comp')">
-            <input type="number" id="input-bank" placeholder="Bank Amount" step="0.01" onkeydown="handleBankKey(event, 'bank')">
-            <button class="btn-list" onclick="addBankEntry()">List Now</button>
-        </div>
-        <button class="btn-export" onclick="exportData('bank')">📥 Export Bank List</button>
+            if (balanceHeight > totalHeight) {
+                document.getElementById('result').textContent = 'Balance height cannot exceed total height';
+                return;
+            }
 
-        <h4 style="margin-top:20px;">Recent History</h4>
-        <div class="list-container">
-            <div class="list-header bank-grid">
-                <div>Computer</div><div>Bank</div><div>Time</div><div></div>
-            </div>
-            <div id="bank-list"></div>
-        </div>
-    </div>
-</div>
+            // Calculate water height and volume
+            const waterHeight = totalHeight - balanceHeight;
+            const radius = diameter / 2;
+            const volumeCm3 = Math.PI * Math.pow(radius, 2) * waterHeight;
+            const volumeLiters = volumeCm3 / 1000;
 
-<script>
-    // Constants & Initialization
-    const DOC_KEY = 'doc_entries_v2';
-    const BANK_KEY = 'bank_entries_v2';
-    const get = (id) => document.getElementById(id);
-    const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-    const load = (key) => JSON.parse(localStorage.getItem(key)) || [];
-    const formatTime = () => new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-
-    function openTab(id) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-        get(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-    }
-
-    // --- Doctor Logic ---
-    function addDoctorEntry() {
-        const amt = parseFloat(get('doc-amount').value);
-        const name = get('doc-name').value.trim();
-        if (isNaN(amt)) return;
-
-        const entries = load(DOC_KEY);
-        entries.push({ amt, name: name || 'N/A', paid: false, time: formatTime() });
-        save(DOC_KEY, entries);
-        renderDoctor();
-        get('doc-amount').value = ''; get('doc-name').value = ''; get('doc-amount').focus();
-    }
-
-    function renderDoctor() {
-        const entries = load(DOC_KEY);
-        let payable = 0;
-        get('doctor-list').innerHTML = entries.slice().reverse().map((e, i) => {
-            const idx = entries.length - 1 - i;
-            if (!e.paid) payable += e.amt;
-            return `
-                <div class="list-item doctor-grid">
-                    <input type="checkbox" ${e.paid ? 'checked' : ''} onchange="toggleDoc(${idx})">
-                    <div style="font-weight:bold">${e.amt.toFixed(2)}</div>
-                    <div>${e.name}</div>
-                    <div style="color:#888; font-size:0.85em">${e.time}</div>
-                    <button class="delete-btn" onclick="deleteItem('${DOC_KEY}', ${idx}, renderDoctor)">🗑️</button>
-                </div>
-            `;
-        }).join('');
-        get('doc-payable').textContent = payable.toFixed(2);
-    }
-
-    function toggleDoc(idx) {
-        const entries = load(DOC_KEY);
-        entries[idx].paid = !entries[idx].paid;
-        save(DOC_KEY, entries);
-        renderDoctor();
-    }
-
-    function quickAdd(val) { get('doc-amount').value = val; get('doc-name').focus(); }
-    function handleDocKey(e) { if(e.key === 'Enter') addDoctorEntry(); }
-
-    // --- Bank Logic ---
-    function addBankEntry() {
-        const comp = parseFloat(get('input-comp').value) || 0;
-        const bank = parseFloat(get('input-bank').value) || 0;
-        if (comp === 0 && bank === 0) return;
-
-        const entries = load(BANK_KEY);
-        entries.push({ comp, bank, time: formatTime() });
-        save(BANK_KEY, entries);
-        renderBank();
-        get('input-comp').value = ''; get('input-bank').value = ''; get('input-comp').focus();
-    }
-
-    function renderBank() {
-        const entries = load(BANK_KEY);
-        let cTotal = 0, bTotal = 0;
-        
-        get('bank-list').innerHTML = entries.slice().reverse().map((e, i) => {
-            const idx = entries.length - 1 - i;
-            cTotal += e.comp; bTotal += e.bank;
-            return `
-                <div class="list-item bank-grid">
-                    <div>${e.comp.toFixed(2)}</div>
-                    <div>${e.bank.toFixed(2)}</div>
-                    <div style="color:#888; font-size:0.85em">${e.time}</div>
-                    <button class="delete-btn" onclick="deleteItem('${BANK_KEY}', ${idx}, renderBank)">🗑️</button>
-                </div>
-            `;
-        }).join('');
-
-        get('comp-total').textContent = cTotal.toFixed(2);
-        get('bank-total').textContent = bTotal.toFixed(2);
-        
-        const diff = bTotal - cTotal;
-        get('bank-diff').textContent = diff.toFixed(2);
-        get('diff-box').style.background = diff === 0 ? '#f8fbff' : (diff > 0 ? '#e8f5e9' : '#ffebee');
-
-        // Animations Logic
-        get('comp-arrow').innerHTML = bTotal > cTotal ? '<span class="trend-up">▲</span>' : '';
-        get('bank-arrow').innerHTML = cTotal > bTotal ? '<span class="trend-down">▼</span>' : '';
-    }
-
-    function handleBankKey(e, type) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            type === 'comp' ? get('input-bank').focus() : get('input-comp').focus();
-        } else if (e.key === 'Enter') {
-            addBankEntry();
+            // Display result
+            document.getElementById('result').textContent = 
+                `Water Volume: ${volumeLiters.toFixed(2)} liters (Water height: ${waterHeight.toFixed(1)} cm)`;
         }
-    }
 
-    // --- Shared Utilities ---
-    function deleteItem(key, idx, callback) {
-        if(!confirm("Delete this entry?")) return;
-        const entries = load(key);
-        entries.splice(idx, 1);
-        save(key, entries);
-        callback();
-    }
-
-    function exportData(type) {
-        const key = type === 'doctor' ? DOC_KEY : BANK_KEY;
-        const data = load(key);
-        if(data.length === 0) return alert("No data to export");
-        
-        let csv = type === 'doctor' ? "Amount,Name,Paid,Time\n" : "Computer,Bank,Time\n";
-        data.forEach(e => {
-            csv += type === 'doctor' ? `${e.amt},${e.name},${e.paid},${e.time}\n` : `${e.comp},${e.bank},${e.time}\n`;
-        });
-
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${type}_tracker_${new Date().toLocaleDateString()}.csv`;
-        a.click();
-    }
-
-    // Auto-reset check (simplified for demo)
-    document.addEventListener('DOMContentLoaded', () => {
-        renderDoctor();
-        renderBank();
-    });
-</script>
-
+        // Add event listeners to all inputs
+        document.getElementById('totalHeight').addEventListener('input', calculateVolume);
+        document.getElementById('balanceHeight').addEventListener('input', calculateVolume);
+        document.getElementById('diameter').addEventListener('input', calculateVolume);
+    </script>
 
 </body></html>
